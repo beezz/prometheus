@@ -11,6 +11,7 @@ networks:
     driver: bridge
 
 services:
+
   prometheus:
     image: prom/prometheus
     container_name: prometheus
@@ -32,7 +33,17 @@ services:
       - cadvisor
     networks:
       - back-tier
-  
+
+  pushgateway:
+    image: prom/pushgateway
+    container_name: pushgateway
+    expose:
+      - 9091
+    ports:
+      - 9091:9091
+    networks:
+      - back-tier
+
   node-exporter:
     image: prom/node-exporter
     expose:
@@ -43,14 +54,14 @@ services:
     image: prom/alertmanager
     ports:
       - 9093:9093
-    volumes: 
+    volumes:
       - ./alertmanager/:/etc/alertmanager/
     networks:
       - back-tier
     command:
       - '-config.file=/etc/alertmanager/config.yml'
       - '-storage.path=/alertmanager'
-      
+
   cadvisor:
     image: google/cadvisor
     volumes:
@@ -62,7 +73,7 @@ services:
       - 8080
     networks:
       - back-tier
-  
+
   grafana:
     image: grafana/grafana
     depends_on:
